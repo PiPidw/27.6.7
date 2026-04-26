@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiPidw Desktop</title>
+    <link rel="preconnect" href="https://pipidw.github.io">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            overflow: hidden;
+            background: #000;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI2IDMyIj4KICA8cGF0aCBkPSJNNy41IDIuNSBDNy41IDIuNSA3LjUgMi41IDcuNSAyLjUgTDcuNSAyMi41IEwxMS41IDE4LjUgTDE1LjUgMjcuNSBDMTUuOCAyOC4yIDE2LjYgMjguNSAxNy4zIDI4LjIgTDE5LjggMjcuMiBDMjAuNSAyNi45IDIwLjggMjYuMSAyMC41IDI1LjQgTDE2LjUgMTYuNSBMMjIuNSAxNi41IEMyMy4yIDE2LjUgMjMuOCAxNiAyMy45IDE1LjMgQzI0IDE0LjYgMjMuNiAxNCAyMyAxMy43IEw5IDIuNyBDOC41IDIuNCA4IDIuMyA3LjUgMi41IFoiIAogICAgZmlsbD0iIzFhMWExYSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==') 4 2, auto;
+        }
+
+        a, button, .dock-item, .edge-btn, .home-btn, .edge-shortcut, .app-card,
+        .download-btn, .split-btn, .edge-tab, .edge-new-tab, .edge-tab-close,
+        .app-window-close, .split-window-close, [onclick] {
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI2IDMyIj4KICA8cGF0aCBkPSJNNy41IDIuNSBDNy41IDIuNSA3LjUgMi41IDcuNSAyLjUgTDcuNSAyMi41IEwxMS41IDE4LjUgTDE1LjUgMjcuNSBDMTUuOCAyOC4yIDE2LjYgMjguNSAxNy4zIDI4LjIgTDE5LjggMjcuMiBDMjAuNSAyNi45IDIwLjggMjYuMSAyMC41IDI1LjQgTDE2LjUgMTYuNSBMMjIuNSAxNi41IEMyMy4yIDE2LjUgMjMuOCAxNiAyMy45IDE1LjMgQzI0IDE0LjYgMjMuNiAxNCAyMyAxMy43IEw5IDIuNyBDOC41IDIuNCA4IDIuMyA3LjUgMi41IFoiIAogICAgZmlsbD0iIzFhMWExYSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==') 4 2, pointer;
+        }
+
+        input, textarea, [contenteditable] {
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDIwIDI4Ij4KICA8cGF0aCBkPSJNOSAzIEwxMSAzIEwxMSAxMC41IEwxNCAxMC41IEwxNCAxMi41IEwxMSAxMi41IEwxMSAxNS41IEwxNCAxNS41IEwxNCAxNy41IEwxMSAxNy41IEwxMSAyNSBMOSAyNSBMOSAxNy41IEw2IDE3LjUgTDYgMTUuNSBMOSAxNS41IEw5IDEyLjUgTDYgMTIuNSBMNiAxMC41IEw5IDEwLjUgWiIgCiAgICBmaWxsPSIjMWExYTFhIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMS40IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==') 10 14, text;
+        }
+
+        /* 启动加载界面 */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+            will-change: opacity, visibility;
+        }
+        #boot-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .brand-text {
+            font-size: 3rem;
+            font-weight: 200;
+            letter-spacing: 0.08em;
+            color: #fff;
+        }
+        .progress-container {
+            width: 280px;
+            height: 2px;
+            background: #222;
+            overflow: hidden;
+            position: relative;
+            margin-top: 2.5rem;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 20px rgba(255,255,255,0.6);
+            will-change: width;
+        }
+
+        /* 桌面 */
+        #desktop {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: 
+            /* 几何色块层 */
+            radial-gradient(ellipse 80% 60% at 15% 20%, rgba(102, 126, 234, 0.35) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 80% at 85% 15%, rgba(118, 75, 162, 0.3) 0%, transparent 55%),
+            radial-gradient(ellipse 70% 70% at 75% 80%, rgba(240, 147, 251, 0.25) 0%, transparent 50%),
+            radial-gradient(ellipse 50% 90% at 10% 75%, rgba(79, 172, 254, 0.3) 0%, transparent 55%),
+            radial-gradient(ellipse 90% 50% at 50% 50%, rgba(246, 211, 101, 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 60% at 90% 50%, rgba(17, 153, 142, 0.2) 0%, transparent 50%),
+            /* 几何网格纹理 */
+            linear-gradient(135deg, rgba(255,255,255,0.4) 25%, transparent 25%),
+            linear-gradient(225deg, rgba(255,255,255,0.4) 25%, transparent 25%),
+            linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%),
+            linear-gradient(315deg, rgba(255,255,255,0.4) 25%, transparent 25%),
+            /* 底色 */
+            linear-gradient(160deg, #f0f2f5 0%, #e2e6ea 40%, #d5dbe0 100%);
+        background-size: 
+            100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%,
+            60px 60px, 60px 60px, 60px 60px, 60px 60px,
+            100% 100%;
+        background-position: 
+            0 0, 0 0, 0 0, 0 0, 0 0, 0 0,
+            0 0, 0 0, 0 0, 0 0,
+            0 0;
+            opacity: 0;
+            transform: scale(1.05);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+            will-change: opacity, transform;
+            contain: layout style paint;
+        }
+        #desktop.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 灵动岛 */
+        .dynamic-island-bar {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            min-width: 120px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;
+            border: 1px solid rgba(255,255,255,0.5);
+            will-change: transform, opacity;
+            pointer-events: none;
+            user-select: none;
+        }
+        #desktop.show .dynamic-island-bar {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .island-time {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* Dock */
+        .dock {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 28px;
+            padding: 12px 20px;
+            display: flex;
+            gap: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.8s, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s;
+            border: 1px solid rgba(255,255,255,0.5);
+            will-change: transform, opacity;
+        }
+        #desktop.show .dock {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .dock-item {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.75));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            will-change: transform;
+        }
+        .dock-item:hover {
+            transform: translateY(-8px) scale(1.1);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+        .dock-item::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 4px;
+            height: 4px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .dock-item.active::after {
+            opacity: 1;
+        }
+        .dock-icon {
+            width: 28px;
+            height: 28px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Edge 浏览器 */
+        .edge-browser {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1400px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            will-change: transform, opacity, visibility;
+            contain: layout style paint;
+        }
+        .edge-browser.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        .edge-tabs-bar {
+            height: 40px;
+            background: rgba(243, 243, 243, 0.98);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: flex-end;
+            padding: 0 8px;
+            gap: 2px;
+        }
+        .edge-tab {
+            height: 36px;
+            min-width: 140px;
+            max-width: 200px;
+            background: transparent;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 8px;
+            font-size: 12px;
+            color: #5f6368;
+            position: relative;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-bottom: -1px;
+        }
+        .edge-tab:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .edge-tab.active {
+            background: #fff;
+            color: #1a73e8;
+            border-color: rgba(0,0,0,0.08);
+            border-bottom: 2px solid #1a73e8;
+        }
+        .edge-tab-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .edge-tab-icon svg {
+            width: 10px;
+            height: 10px;
+            color: #fff;
+        }
+        .edge-tab-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .edge-tab-close {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .edge-tab:hover .edge-tab-close {
+            opacity: 1;
+        }
+        .edge-tab-close:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .edge-new-tab {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #5f6368;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+        .edge-new-tab:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .edge-toolbar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .edge-controls {
+            display: flex;
+            gap: 4px;
+        }
+        .edge-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .edge-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .edge-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #5f6368;
+        }
+        .edge-address-container {
+            flex: 1;
+            height: 32px;
+            background: rgba(241, 243, 244, 0.8);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 10px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .edge-address-container:focus-within {
+            background: #fff;
+            border-color: rgba(26, 115, 232, 0.3);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        .edge-address-container svg {
+            width: 14px;
+            height: 14px;
+            fill: #5f6368;
+            flex-shrink: 0;
+        }
+        .edge-address-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            color: #202124;
+            outline: none;
+        }
+        .edge-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .home-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: rgba(26, 115, 232, 0.1);
+            transition: all 0.2s;
+        }
+        .home-btn:hover {
+            background: rgba(26, 115, 232, 0.2);
+        }
+        .home-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #1a73e8;
+        }
+        .edge-content {
+            flex: 1;
+            background: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+        .edge-newtab {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e8eaed 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 40px;
+            gap: 35px;
+            overflow-y: auto;
+        }
+        .edge-logo {
+            font-size: 42px;
+            font-weight: 300;
+            color: #1a73e8;
+            letter-spacing: -1px;
+        }
+        .edge-search-box {
+            width: 100%;
+            max-width: 580px;
+            height: 48px;
+            background: #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        .edge-search-box:focus-within {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        .edge-search-box svg {
+            width: 20px;
+            height: 20px;
+            fill: #9aa0a6;
+        }
+        .edge-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            color: #202124;
+            outline: none;
+        }
+        .edge-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .edge-shortcut {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .edge-shortcut:hover {
+            background: rgba(255,255,255,0.6);
+            transform: translateY(-4px);
+        }
+        .edge-shortcut-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .edge-shortcut-icon svg {
+            width: 28px;
+            height: 28px;
+            color: #fff;
+        }
+        .edge-shortcut-title {
+            font-size: 12px;
+            color: #5f6368;
+            font-weight: 500;
+        }
+        .edge-webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+        .edge-webview.active {
+            display: block;
+        }
+
+        /* 应用商城 */
+        .appstore-window {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1000px;
+            background: rgba(245, 245, 247, 0.98);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.8);
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            will-change: transform, opacity, visibility;
+            contain: layout style paint;
+        }
+        .appstore-window.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        .appstore-header {
+            height: 56px;
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+        }
+        .appstore-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1d1f;
+            flex: 1;
+            text-align: center;
+        }
+        .appstore-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .app-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .app-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #fff;
+        }
+        .app-info {
+            flex: 1;
+        }
+        .app-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        .app-category {
+            font-size: 12px;
+            color: #86868b;
+            margin-bottom: 8px;
+        }
+        .app-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .download-btn {
+            padding: 6px 16px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .download-btn:hover {
+            background: #0051d5;
+        }
+        .download-btn.installed {
+            background: #34c759;
+        }
+        .split-btn {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.05);
+            color: #007aff;
+            border: 1px solid #007aff;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: none;
+        }
+        .split-btn:hover {
+            background: #007aff;
+            color: #fff;
+        }
+        .split-btn.show {
+            display: block;
+        }
+
+        /* 遮罩层 */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.15);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1500;
+            will-change: opacity, visibility;
+        }
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 启动完成提示 */
+        .boot-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 3000;
+            will-change: opacity;
+        }
+        .boot-complete.show {
+            opacity: 1;
+        }
+        .boot-complete h1 {
+            font-size: 52px;
+            font-weight: 300;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .boot-complete p {
+            font-size: 20px;
+            opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* 应用窗口 */
+        .app-window {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            will-change: transform, opacity, visibility;
+            contain: layout style paint;
+        }
+        .app-window.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        .app-window-header {
+            height: 44px;
+            background: rgba(243, 243, 243, 0.98);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+        .app-window-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+            text-align: center;
+        }
+        .app-window-close {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f57;
+            transition: all 0.2s;
+        }
+        .app-window-close:hover {
+            transform: scale(1.2);
+        }
+        .app-window-content {
+            flex: 1;
+            overflow: hidden;
+        }
+        .app-window-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 分身窗口 */
+        .split-view-container {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            width: 95vw;
+            height: 85vh;
+            max-width: 1600px;
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2000;
+            display: flex;
+            gap: 10px;
+            padding: 0 10px;
+            will-change: transform, opacity, visibility;
+        }
+        .split-view-container.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        .split-window {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            contain: layout style paint;
+        }
+        .split-window-header {
+            height: 44px;
+            background: rgba(243, 243, 243, 0.98);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+        .split-window-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+            text-align: center;
+        }
+        .split-window-close {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f57;
+            transition: all 0.2s;
+        }
+        .split-window-close:hover {
+            transform: scale(1.2);
+        }
+        .split-window-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .split-window-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .split-divider {
+            width: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 设置窗口 */
+        .settings-window {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            width: 90vw;
+            height: 85vh;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            will-change: transform, opacity, visibility;
+            contain: layout style paint;
+        }
+        .settings-window.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        .settings-header {
+            height: 56px;
+            background: rgba(243, 243, 243, 0.98);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+        }
+        .settings-header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-align: center;
+        }
+        .settings-close {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f57;
+            transition: all 0.2s;
+        }
+        .settings-close:hover {
+            transform: scale(1.2);
+        }
+        .settings-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .settings-sidebar {
+            width: 220px;
+            background: rgba(250, 250, 250, 0.98);
+            border-right: 1px solid rgba(0,0,0,0.06);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+        }
+        .settings-category {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #5f6368;
+            transition: all 0.2s;
+        }
+        .settings-category:hover {
+            background: rgba(0,0,0,0.04);
+            color: #1d1d1f;
+        }
+        .settings-category.active {
+            background: rgba(0,122,255,0.1);
+            color: #007aff;
+            font-weight: 600;
+        }
+        .settings-category svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .settings-content {
+            flex: 1;
+            padding: 32px 40px;
+            overflow-y: auto;
+        }
+        .settings-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        .settings-section-desc {
+            font-size: 14px;
+            color: #86868b;
+            margin-bottom: 32px;
+        }
+        .settings-group {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .settings-group-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+        .settings-row-label {
+            font-size: 15px;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+        .settings-row-desc {
+            font-size: 12px;
+            color: #86868b;
+            margin-top: 2px;
+        }
+        .settings-toggle {
+            width: 48px;
+            height: 28px;
+            background: #e5e5ea;
+            border-radius: 14px;
+            position: relative;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .settings-toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+        .settings-toggle.on {
+            background: #34c759;
+        }
+        .settings-toggle.on::after {
+            left: 22px;
+        }
+        .settings-select {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.04);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #5f6368;
+            border: none;
+            outline: none;
+            min-width: 140px;
+            text-align: right;
+        }
+        .settings-btn {
+            padding: 8px 20px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .settings-btn:hover {
+            background: #0051d5;
+        }
+        .settings-btn-secondary {
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.05);
+            color: #007aff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .settings-btn-secondary:hover {
+            background: rgba(0,0,0,0.08);
+        }
+        .settings-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .split-divider-line {
+            width: 4px;
+            height: 60px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+        }
+
+        /* Win11 右键菜单 */
+        .win11-context-menu {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+            z-index: 10000;
+            min-width: 240px;
+            opacity: 0;
+            transform: scale(0.96);
+            pointer-events: none;
+            transition: opacity 0.12s ease, transform 0.12s ease;
+            border: 1px solid rgba(255,255,255,0.7);
+            user-select: none;
+        }
+        .win11-context-menu.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .ctx-section { display: flex; flex-direction: column; }
+        .ctx-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: background 0.12s;
+            position: relative;
+        }
+        .ctx-item:hover { background: rgba(0,0,0,0.06); }
+        .ctx-item:active { background: rgba(0,0,0,0.1); }
+        .ctx-item svg { width: 17px; height: 17px; color: #5f6368; flex-shrink: 0; }
+        .ctx-divider { height: 1px; background: rgba(0,0,0,0.08); margin: 3px 8px; }
+        .ctx-arrow { margin-left: auto; color: #86868b; font-size: 15px; font-weight: 300; }
+        .ctx-submenu-panel {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+            z-index: 10001;
+            min-width: 180px;
+            opacity: 0;
+            transform: scale(0.96);
+            pointer-events: none;
+            transition: opacity 0.12s ease, transform 0.12s ease;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        .ctx-submenu-panel.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        /* 彩虹转圈加载光标 */
+        .rainbow-cursor {
+            position: fixed;
+            width: 34px;
+            height: 34px;
+            pointer-events: none;
+            z-index: 99999;
+            display: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: normal;
+        }
+        .rainbow-cursor.active { display: block; }
+        .rainbow-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+        }
+        .rainbow-ring::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 3.5px;
+            background: conic-gradient(from 0deg, #ff0080, #ff4d00, #ffcc00, #33ff77, #00ccff, #9966ff, #ff0080);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: rainbowSpin 0.55s linear infinite;
+        }
+        .rainbow-ring::after {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(2px);
+        }
+        @keyframes rainbowSpin {
+            to { transform: rotate(360deg); }
+        }
+        body.rainbow-loading, body.rainbow-loading * {
+            cursor: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="boot-screen">
+        <div class="brand-text">PiPidw</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="desktop">
+        <div class="dynamic-island-bar">
+            <div class="island-time" id="island-clock">12:00:00</div>
+        </div>
+        <div class="dock" id="dock">
+            <div class="dock-item" onclick="openAppStore()" title="应用商城" data-app="appstore">
+                <div class="dock-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="dock-item" onclick="openBrowser()" title="Edge 浏览器" data-app="browser">
+                <div class="dock-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="dock-item" onclick="openSettings()" title="设置" data-app="settings">
+                <div class="dock-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" onclick="closeAllWindows()"></div>
+
+    <div class="edge-browser" id="edgeBrowser">
+        <div class="edge-tabs-bar">
+            <div class="edge-tab active" id="tab-0">
+                <div class="edge-tab-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <span class="edge-tab-title">新标签页</span>
+                <span class="edge-tab-close">&times;</span>
+            </div>
+            <div class="edge-new-tab">+</div>
+        </div>
+        <div class="edge-toolbar">
+            <div class="edge-controls">
+                <button class="edge-btn" onclick="goBack()" title="后退">
+                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                </button>
+                <button class="edge-btn" onclick="goForward()" title="前进">
+                    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+                <button class="edge-btn" onclick="refresh()" title="刷新">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+                <button class="home-btn" onclick="goHome()" title="返回主页">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </button>
+            </div>
+            <div class="edge-address-container">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                <input type="text" class="edge-address-input" id="addressInput" placeholder="搜索或输入网址" onkeydown="handleAddressKey(event)">
+            </div>
+            <div class="edge-actions">
+                <button class="edge-btn" onclick="closeBrowser()" title="关闭">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="edge-content" id="edgeContent">
+            <div class="edge-newtab" id="newTabPage">
+                <div class="edge-logo">PiPidw Browser</div>
+                <div class="edge-search-box">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" class="edge-search-input" placeholder="搜索或输入网址" onkeydown="handleSearchKey(event)">
+                </div>
+                <div class="edge-shortcuts">
+                    <div class="edge-shortcut" onclick="openUrl('https://www.baidu.com')">
+                        <div class="edge-shortcut-icon" style="background: #2932e1;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                        <span class="edge-shortcut-title">百度</span>
+                    </div>
+                    <div class="edge-shortcut" onclick="openUrl('https://www.bilibili.com')">
+                        <div class="edge-shortcut-icon" style="background: #fb7299;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                        </div>
+                        <span class="edge-shortcut-title">哔哩哔哩</span>
+                    </div>
+                    <div class="edge-shortcut" onclick="openUrl('https://www.douyin.com')">
+                        <div class="edge-shortcut-icon" style="background: #000;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        </div>
+                        <span class="edge-shortcut-title">抖音</span>
+                    </div>
+                    <div class="edge-shortcut" onclick="openUrl('https://www.github.com')">
+                        <div class="edge-shortcut-icon" style="background: #24292e;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                        </div>
+                        <span class="edge-shortcut-title">GitHub</span>
+                    </div>
+                    <div class="edge-shortcut" onclick="openUrl('https://pipidw.github.io/MobileGames/')">
+                        <div class="edge-shortcut-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+                        </div>
+                        <span class="edge-shortcut-title">游戏</span>
+                    </div>
+                </div>
+            </div>
+            <iframe class="edge-webview" id="webview" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation" referrerpolicy="no-referrer"></iframe>
+        </div>
+    </div>
+
+    <div class="appstore-window" id="appstoreWindow">
+        <div class="appstore-header">
+            <div style="display: flex; gap: 8px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f57;" onclick="closeAppStore()"></div>
+            </div>
+            <div class="appstore-title">App Store</div>
+        </div>
+        <div class="appstore-content">
+            <div class="apps-grid">
+                <div class="app-card" data-app-id="mobilegames">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">Mobile Games</div>
+                        <div class="app-category">游戏合集</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-mobilegames" onclick="installApp('mobilegames')">获取</button>
+                            <button class="split-btn" id="split-mobilegames" onclick="openSplitView('mobilegames')">分身</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-card" data-app-id="ganne2">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">Ganne 2</div>
+                        <div class="app-category">射击游戏</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-ganne2" onclick="installApp('ganne2')">获取</button>
+                            <button class="split-btn" id="split-ganne2" onclick="openSplitView('ganne2')">分身</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-card" data-app-id="cloudspace">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">云空间</div>
+                        <div class="app-category">云存储工具</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-cloudspace" onclick="installApp('cloudspace')">获取</button>
+                            <button class="split-btn" id="split-cloudspace" onclick="openSplitView('cloudspace')">分身</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-card" data-app-id="lifereset">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">人生重开模拟器</div>
+                        <div class="app-category">文字模拟</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-lifereset" onclick="installApp('lifereset')">获取</button>
+                            <button class="split-btn" id="split-lifereset" onclick="openSplitView('lifereset')">分身</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-card" data-app-id="jump">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">跳一跳 3D</div>
+                        <div class="app-category">休闲跳跃</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-jump" onclick="installApp('jump')">获取</button>
+                            <button class="split-btn" id="split-jump" onclick="openSplitView('jump')">分身</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-card" data-app-id="ren2">
+                    <div class="app-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <div class="app-info">
+                        <div class="app-name">人生重开模拟器 Pro</div>
+                        <div class="app-category">高级模拟</div>
+                        <div class="app-actions">
+                            <button class="download-btn" id="btn-ren2" onclick="installApp('ren2')">获取</button>
+                            <button class="split-btn" id="split-ren2" onclick="openSplitView('ren2')">分身</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-window" id="appWindow-mobilegames">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('mobilegames')"></div>
+            <div class="app-window-title">Mobile Games</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-mobilegames" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+    <div class="app-window" id="appWindow-ganne2">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('ganne2')"></div>
+            <div class="app-window-title">Ganne 2</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-ganne2" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+    <div class="app-window" id="appWindow-cloudspace">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('cloudspace')"></div>
+            <div class="app-window-title">云空间</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-cloudspace" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+    <div class="app-window" id="appWindow-lifereset">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('lifereset')"></div>
+            <div class="app-window-title">人生重开模拟器</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-lifereset" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+    <div class="app-window" id="appWindow-jump">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('jump')"></div>
+            <div class="app-window-title">跳一跳 3D</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-jump" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+    <div class="app-window" id="appWindow-ren2">
+        <div class="app-window-header">
+            <div class="app-window-close" onclick="closeAppWindow('ren2')"></div>
+            <div class="app-window-title">人生重开模拟器 Pro</div>
+            <div style="width: 12px;"></div>
+        </div>
+        <div class="app-window-content">
+            <iframe id="appFrame-ren2" src="" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <div class="split-view-container" id="splitViewContainer">
+        <div class="split-window" id="splitWindow1">
+            <div class="split-window-header">
+                <div class="split-window-close" onclick="closeSplitView()"></div>
+                <div class="split-window-title" id="splitTitle1">窗口 1</div>
+                <div style="width: 12px;"></div>
+            </div>
+            <div class="split-window-content">
+                <iframe id="splitFrame1" src="" loading="lazy"></iframe>
+            </div>
+        </div>
+        <div class="split-divider">
+            <div class="split-divider-line"></div>
+        </div>
+        <div class="split-window" id="splitWindow2">
+            <div class="split-window-header">
+                <div class="split-window-close" onclick="closeSplitView()"></div>
+                <div class="split-window-title" id="splitTitle2">窗口 2</div>
+                <div style="width: 12px;"></div>
+            </div>
+            <div class="split-window-content">
+                <iframe id="splitFrame2" src="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="boot-complete" id="bootComplete">
+        <h1>欢迎使用 PiPidw</h1>
+        <p>系统已准备就绪</p>
+    </div>
+
+
+    <!-- 彩虹加载光标 -->
+    <div class="rainbow-cursor" id="rainbowCursor">
+        <div class="rainbow-ring"></div>
+    </div>
+
+    <!-- Win11 右键菜单 -->
+    <div class="win11-context-menu" id="contextMenu">
+        <div class="ctx-section">
+            <div class="ctx-item" onclick="ctxAction('view-large')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>大图标</span>
+            </div>
+            <div class="ctx-item" onclick="ctxAction('view-medium')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>中等图标</span>
+            </div>
+            <div class="ctx-item" onclick="ctxAction('view-small')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>小图标</span>
+            </div>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-section">
+            <div class="ctx-item has-submenu" data-submenu="sort" onmouseenter="showSubmenu(this,'sort')" onmouseleave="hideSubmenuDelay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+                <span>排序方式</span>
+                <span class="ctx-arrow">›</span>
+            </div>
+            <div class="ctx-item" onclick="ctxAction('refresh')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                <span>刷新</span>
+            </div>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-section">
+            <div class="ctx-item has-submenu" data-submenu="new" onmouseenter="showSubmenu(this,'new')" onmouseleave="hideSubmenuDelay()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>新建</span>
+                <span class="ctx-arrow">›</span>
+            </div>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-section">
+            <div class="ctx-item" onclick="ctxAction('display')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>显示设置</span>
+            </div>
+            <div class="ctx-item" onclick="ctxAction('personalize')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>个性化</span>
+            </div>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-section">
+            <div class="ctx-item" onclick="ctxAction('terminal')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                <span>在终端中打开</span>
+            </div>
+        </div>
+    </div>
+    <div class="ctx-submenu-panel" id="ctxSubmenuPanel"></div>
+
+    <script>
+        var svgIcons = {
+            appstore: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+            browser: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+            mobilegames: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>',
+            ganne2: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            cloudspace: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
+            lifereset: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+            jump: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+            ren2: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+        };
+
+        var installedApps = JSON.parse(localStorage.getItem('pipidw_installed_apps') || '[]');
+        var currentOpenApp = null;
+        var appConfigs = {
+            'mobilegames': { name: 'Mobile Games', url: 'https://pipidw.github.io/MobileGames/', icon: svgIcons.mobilegames, color: 'linear-gradient(135deg, #667eea, #764ba2)' },
+            'ganne2': { name: 'Ganne 2', url: 'https://pipidw.github.io/Ganne2/', icon: svgIcons.ganne2, color: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+            'cloudspace': { name: '云空间', url: 'https://pipidw.github.io/shy/', icon: svgIcons.cloudspace, color: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
+            'lifereset': { name: '人生重开模拟器', url: 'https://pipidw.github.io/ren/', icon: svgIcons.lifereset, color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+            'jump': { name: '跳一跳 3D', url: 'https://pipidw.github.io/jump/', icon: svgIcons.jump, color: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' },
+            'ren2': { name: '人生重开模拟器 Pro', url: 'https://pipidw.github.io/ren2/', icon: svgIcons.ren2, color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }
+        };
+
+        window.onload = function() {
+            restoreInstalledApps();
+            setLoadingCursor(true);
+            setTimeout(function() {
+                var progressBar = document.getElementById('progress-bar');
+                var startTime = performance.now();
+                var duration = 2500;
+                function animate(currentTime) {
+                    var elapsed = currentTime - startTime;
+                    var progress = Math.min((elapsed / duration) * 100, 100);
+                    var eased = 1 - Math.pow(1 - progress / 100, 3);
+                    progressBar.style.width = eased * 100 + '%';
+                    if (progress < 100) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        setTimeout(function() {
+                            document.getElementById('boot-screen').classList.add('hidden');
+                            setTimeout(function() {
+                                document.getElementById('desktop').classList.add('show');
+                                setTimeout(function() {
+                                    document.getElementById('bootComplete').classList.add('show');
+                                    setLoadingCursor(false);
+                                    setTimeout(function() {
+                                        document.getElementById('bootComplete').classList.remove('show');
+                                    }, 2500);
+                                }, 1500);
+                            }, 400);
+                        }, 500);
+                    }
+                }
+                requestAnimationFrame(animate);
+            }, 800);
+        };
+
+        function restoreInstalledApps() {
+            installedApps.forEach(function(appId) {
+                if (appConfigs[appId]) {
+                    addAppToDock(appId);
+                    updateAppButton(appId);
+                }
+            });
+        }
+
+        function addAppToDock(appId) {
+            var dock = document.getElementById('dock');
+            var config = appConfigs[appId];
+            if (dock.querySelector('[data-app="' + appId + '"]')) return;
+            var dockItem = document.createElement('div');
+            dockItem.className = 'dock-item';
+            dockItem.setAttribute('data-app', appId);
+            dockItem.setAttribute('title', config.name);
+            dockItem.onclick = function() { openApp(appId); };
+            dockItem.innerHTML = '<div class="dock-icon" style="color:#333;">' + config.icon + '</div>';
+            dock.appendChild(dockItem);
+        }
+
+        function openApp(appId) {
+            var config = appConfigs[appId];
+            if (!config) return;
+            closeBrowser();
+            closeAppStore();
+            closeAllAppWindows();
+            closeSplitView();
+            currentOpenApp = appId;
+            var appWindow = document.getElementById('appWindow-' + appId);
+            var appFrame = document.getElementById('appFrame-' + appId);
+            if (appWindow && appFrame) {
+                setLoadingCursor(true);
+                var loaded = false;
+                appFrame.onload = function() { loaded = true; setLoadingCursor(false); };
+                appFrame.onerror = function() { if(!loaded) setLoadingCursor(false); };
+                setTimeout(function() { if(!loaded) setLoadingCursor(false); }, 12000);
+                appFrame.src = config.url;
+                appWindow.classList.add('show');
+                document.querySelector('.overlay').classList.add('show');
+                var dockItem = document.querySelector('[data-app="' + appId + '"]');
+                if (dockItem) dockItem.classList.add('active');
+            }
+        }
+
+        function closeAppWindow(appId) {
+            var appWindow = document.getElementById('appWindow-' + appId);
+            var appFrame = document.getElementById('appFrame-' + appId);
+            if (appWindow) {
+                appWindow.classList.remove('show');
+                setTimeout(function() { appFrame.src = ''; }, 100);
+            }
+            if (!document.getElementById('splitViewContainer').classList.contains('show')) {
+                document.querySelector('.overlay').classList.remove('show');
+            }
+            var dockItem = document.querySelector('[data-app="' + appId + '"]');
+            if (dockItem) dockItem.classList.remove('active');
+            if (currentOpenApp === appId) currentOpenApp = null;
+        }
+
+        function closeAllAppWindows() {
+            Object.keys(appConfigs).forEach(function(appId) {
+                closeAppWindow(appId);
+            });
+        }
+
+        function updateAppButton(appId) {
+            var btn = document.getElementById('btn-' + appId);
+            var splitBtn = document.getElementById('split-' + appId);
+            if (btn) {
+                if (installedApps.indexOf(appId) !== -1) {
+                    btn.textContent = '打开';
+                    btn.classList.add('installed');
+                    if (splitBtn) splitBtn.classList.add('show');
+                } else {
+                    btn.textContent = '获取';
+                    btn.classList.remove('installed');
+                    if (splitBtn) splitBtn.classList.remove('show');
+                }
+            }
+        }
+
+        function updateIslandClock() {
+            var now = new Date();
+            var h = now.getHours().toString().padStart(2, '0');
+            var m = now.getMinutes().toString().padStart(2, '0');
+            var s = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('island-clock').textContent = h + ':' + m + ':' + s;
+        }
+        setInterval(updateIslandClock, 1000);
+        updateIslandClock();
+
+        function openBrowser() {
+            setLoadingCursor(true);
+            setTimeout(function(){ setLoadingCursor(false); }, 600);
+            document.getElementById('edgeBrowser').classList.add('show');
+            document.querySelector('.overlay').classList.add('show');
+            document.querySelectorAll('.dock-item')[1].classList.add('active');
+        }
+        function closeBrowser() {
+            document.getElementById('edgeBrowser').classList.remove('show');
+            document.querySelector('.overlay').classList.remove('show');
+            document.querySelectorAll('.dock-item')[1].classList.remove('active');
+            document.getElementById('webview').src = '';
+        }
+        function goHome() {
+            document.getElementById('newTabPage').style.display = 'flex';
+            document.getElementById('webview').classList.remove('active');
+            document.getElementById('addressInput').value = '';
+            document.getElementById('webview').src = '';
+        }
+        function openUrl(url) {
+            document.getElementById('newTabPage').style.display = 'none';
+            var webview = document.getElementById('webview');
+            webview.classList.add('active');
+            setLoadingCursor(true);
+            var wloaded = false;
+            webview.onload = function() { wloaded = true; setLoadingCursor(false); };
+            webview.onerror = function() { if(!wloaded) setLoadingCursor(false); };
+            setTimeout(function() { if(!wloaded) setLoadingCursor(false); }, 15000);
+            webview.src = url;
+            document.getElementById('addressInput').value = url;
+        }
+        function handleAddressKey(event) {
+            if (event.key === 'Enter') {
+                var url = event.target.value;
+                if (url) {
+                    if (!url.startsWith('http')) url = 'https://' + url;
+                    openUrl(url);
+                }
+            }
+        }
+        function handleSearchKey(event) {
+            if (event.key === 'Enter') {
+                var query = event.target.value;
+                if (query) {
+                    if (query.includes('.') && !query.includes(' ')) {
+                        openUrl('https://' + query);
+                    } else {
+                        openUrl('https://www.bing.com/search?q=' + encodeURIComponent(query));
+                    }
+                }
+            }
+        }
+        function refresh() {
+            var webview = document.getElementById('webview');
+            if (webview.classList.contains('active')) webview.src = webview.src;
+        }
+        function goBack() {
+            var webview = document.getElementById('webview');
+            if (webview.classList.contains('active')) {
+                try { webview.contentWindow.history.back(); } catch(e) {}
+            }
+        }
+        function goForward() {
+            var webview = document.getElementById('webview');
+            if (webview.classList.contains('active')) {
+                try { webview.contentWindow.history.forward(); } catch(e) {}
+            }
+        }
+
+        function openAppStore() {
+            setLoadingCursor(true);
+            setTimeout(function(){ setLoadingCursor(false); }, 500);
+            document.getElementById('appstoreWindow').classList.add('show');
+            document.querySelector('.overlay').classList.add('show');
+            document.querySelectorAll('.dock-item')[0].classList.add('active');
+            installedApps.forEach(function(appId) { updateAppButton(appId); });
+        }
+        function closeAppStore() {
+            document.getElementById('appstoreWindow').classList.remove('show');
+            document.querySelector('.overlay').classList.remove('show');
+            document.querySelectorAll('.dock-item')[0].classList.remove('active');
+        }
+
+        var lsTimeout = null;
+        function saveInstalledApps() {
+            clearTimeout(lsTimeout);
+            lsTimeout = setTimeout(function() {
+                localStorage.setItem('pipidw_installed_apps', JSON.stringify(installedApps));
+            }, 300);
+        }
+
+        function installApp(appId) {
+            if (installedApps.indexOf(appId) === -1) {
+                installedApps.push(appId);
+                saveInstalledApps();
+                addAppToDock(appId);
+                updateAppButton(appId);
+                showNotification(appConfigs[appId].name + ' 已安装到Dock');
+            } else {
+                openApp(appId);
+                closeAppStore();
+            }
+        }
+
+        function openSplitView(appId) {
+            var config = appConfigs[appId];
+            if (!config) return;
+            closeBrowser();
+            closeAppStore();
+            closeAllAppWindows();
+            setLoadingCursor(true);
+            var splitLoaded = 0;
+            var splitFrame1 = document.getElementById('splitFrame1');
+            var splitFrame2 = document.getElementById('splitFrame2');
+            function checkSplitLoaded() { splitLoaded++; if(splitLoaded>=2) setLoadingCursor(false); }
+            splitFrame1.onload = checkSplitLoaded;
+            splitFrame2.onload = checkSplitLoaded;
+            setTimeout(function() { if(splitLoaded<2) setLoadingCursor(false); }, 15000);
+            document.getElementById('splitTitle1').textContent = config.name + ' - 左';
+            document.getElementById('splitTitle2').textContent = config.name + ' - 右';
+            splitFrame1.src = config.url;
+            splitFrame2.src = config.url;
+            document.getElementById('splitViewContainer').classList.add('show');
+            document.querySelector('.overlay').classList.add('show');
+            showNotification(config.name + ' 分身模式已启动');
+        }
+        function closeSplitView() {
+            document.getElementById('splitViewContainer').classList.remove('show');
+            document.querySelector('.overlay').classList.remove('show');
+            setTimeout(function() {
+                document.getElementById('splitFrame1').src = '';
+                document.getElementById('splitFrame2').src = '';
+            }, 100);
+        }
+
+        function showNotification(message) {
+            var notif = document.createElement('div');
+            notif.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:rgba(0,0,0,0.8);color:#fff;padding:12px 24px;border-radius:20px;font-size:14px;z-index:10001;opacity:0;transition:all 0.3s;will-change:transform,opacity;';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            requestAnimationFrame(function() {
+                notif.style.opacity = '1';
+                notif.style.transform = 'translateX(-50%) translateY(0)';
+            });
+            setTimeout(function() {
+                notif.style.opacity = '0';
+                notif.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(function() { if (notif.parentNode) notif.parentNode.removeChild(notif); }, 300);
+            }, 2000);
+        }
+
+        function closeAllWindows() {
+            closeBrowser();
+            closeAppStore();
+            closeAllAppWindows();
+            closeSplitView();
+            closeSettings();
+        }
+
+        function openSettings() {
+            setLoadingCursor(true);
+            setTimeout(function(){ setLoadingCursor(false); }, 500);
+            document.getElementById('settingsWindow').classList.add('show');
+            document.querySelector('.overlay').classList.add('show');
+            document.querySelectorAll('.dock-item')[2].classList.add('active');
+        }
+        function closeSettings() {
+            document.getElementById('settingsWindow').classList.remove('show');
+            document.querySelector('.overlay').classList.remove('show');
+            document.querySelectorAll('.dock-item')[2].classList.remove('active');
+        }
+
+        // ========== 彩虹加载光标 ==========
+        var rainbowCursor = document.getElementById('rainbowCursor');
+        var loadingCounter = 0;
+        function setLoadingCursor(loading) {
+            if (loading) {
+                loadingCounter++;
+            } else {
+                loadingCounter = Math.max(0, loadingCounter - 1);
+            }
+            if (loadingCounter > 0) {
+                rainbowCursor.classList.add('active');
+                document.body.classList.add('rainbow-loading');
+            } else {
+                rainbowCursor.classList.remove('active');
+                document.body.classList.remove('rainbow-loading');
+            }
+        }
+        document.addEventListener('mousemove', function(e) {
+            if (loadingCounter > 0) {
+                rainbowCursor.style.left = e.clientX + 'px';
+                rainbowCursor.style.top = e.clientY + 'px';
+            }
+        });
+
+        // ========== Win11 右键菜单 ==========
+        var contextMenu = document.getElementById('contextMenu');
+        var ctxSubmenuPanel = document.getElementById('ctxSubmenuPanel');
+        var submenuTimer = null;
+        var submenuData = {
+            'sort': [
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>', label:'名称', action:'sort-name'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>', label:'大小', action:'sort-size'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>', label:'项目类型', action:'sort-type'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>', label:'修改日期', action:'sort-date'}
+            ],
+            'new': [
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>', label:'文件夹', action:'new-folder'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>', label:'快捷方式', action:'new-shortcut'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>', label:'文本文档', action:'new-txt'},
+                {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>', label:'ZIP 压缩文件', action:'new-zip'}
+            ]
+        };
+
+        function showSubmenu(parent, type) {
+            clearTimeout(submenuTimer);
+            var data = submenuData[type];
+            if (!data) return;
+            var rect = parent.getBoundingClientRect();
+            var html = '<div class="ctx-section">' + data.map(function(item) {
+                return '<div class="ctx-item" onclick="ctxAction(&quot;' + item.action + '&quot;)">' + item.icon + '<span>' + item.label + '</span></div>';
+            }).join('') + '</div>';
+            ctxSubmenuPanel.innerHTML = html;
+            ctxSubmenuPanel.classList.add('show');
+            var subRect = ctxSubmenuPanel.getBoundingClientRect();
+            var left = rect.right + 4;
+            var top = rect.top;
+            if (left + subRect.width > window.innerWidth) left = rect.left - subRect.width - 4;
+            if (top + subRect.height > window.innerHeight) top = window.innerHeight - subRect.height - 8;
+            ctxSubmenuPanel.style.left = left + 'px';
+            ctxSubmenuPanel.style.top = top + 'px';
+        }
+        function hideSubmenuDelay() {
+            submenuTimer = setTimeout(function() {
+                ctxSubmenuPanel.classList.remove('show');
+            }, 150);
+        }
+        ctxSubmenuPanel.addEventListener('mouseenter', function() { clearTimeout(submenuTimer); });
+        ctxSubmenuPanel.addEventListener('mouseleave', function() { ctxSubmenuPanel.classList.remove('show'); });
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.edge-browser, .appstore-window, .app-window, .split-view-container, .settings-window, .win11-context-menu, .ctx-submenu-panel')) return;
+            e.preventDefault();
+            ctxSubmenuPanel.classList.remove('show');
+            contextMenu.classList.add('show');
+            var x = e.clientX;
+            var y = e.clientY;
+            var rect = contextMenu.getBoundingClientRect();
+            if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+            if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.win11-context-menu') && !e.target.closest('.ctx-submenu-panel')) {
+                contextMenu.classList.remove('show');
+                ctxSubmenuPanel.classList.remove('show');
+            }
+        });
+        document.addEventListener('scroll', function() {
+            contextMenu.classList.remove('show');
+            ctxSubmenuPanel.classList.remove('show');
+        }, true);
+
+        function ctxAction(action) {
+            contextMenu.classList.remove('show');
+            ctxSubmenuPanel.classList.remove('show');
+            switch(action) {
+                case 'view-large': showNotification('已切换为大图标'); break;
+                case 'view-medium': showNotification('已切换为中等图标'); break;
+                case 'view-small': showNotification('已切换为小图标'); break;
+                case 'refresh': location.reload(); break;
+                case 'display': showNotification('显示设置'); break;
+                case 'personalize': showNotification('个性化设置'); break;
+                case 'terminal': showNotification('正在启动终端...'); break;
+                case 'sort-name': showNotification('按名称排序'); break;
+                case 'sort-size': showNotification('按大小排序'); break;
+                case 'sort-type': showNotification('按类型排序'); break;
+                case 'sort-date': showNotification('按日期排序'); break;
+                case 'new-folder': showNotification('新建文件夹'); break;
+                case 'new-shortcut': showNotification('新建快捷方式'); break;
+                case 'new-txt': showNotification('新建文本文档'); break;
+                case 'new-zip': showNotification('新建 ZIP 文件'); break;
+            }
+        }
+    </script>
+</body>
+</html>
