@@ -14,6 +14,9 @@
             background: #000;
             cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI2IDMyIj4KICA8cGF0aCBkPSJNNy41IDIuNSBDNy41IDIuNSA3LjUgMi41IDcuNSAyLjUgTDcuNSAyMi41IEwxMS41IDE4LjUgTDE1LjUgMjcuNSBDMTUuOCAyOC4yIDE2LjYgMjguNSAxNy4zIDI4LjIgTDE5LjggMjcuMiBDMjAuNSAyNi45IDIwLjggMjYuMSAyMC41IDI1LjQgTDE2LjUgMTYuNSBMMjIuNSAxNi41IEMyMy4yIDE2LjUgMjMuOCAxNiAyMy45IDE1LjMgQzI0IDE0LjYgMjMuNiAxNCAyMyAxMy43IEw5IDIuNyBDOC41IDIuNCA4IDIuMyA3LjUgMi41IFoiIAogICAgZmlsbD0iIzFhMWExYSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==') 4 2, auto;
         }
+        iframe {
+            cursor: inherit !important;
+        }
 
         a, button, .dock-item, .edge-btn, .home-btn, .edge-shortcut, .app-card,
         .download-btn, .split-btn, .edge-tab, .edge-new-tab, .edge-tab-close,
@@ -758,10 +761,13 @@
             flex: 1;
             overflow: hidden;
         }
-        .app-window-content iframe {
+        .app-window-content iframe,
+        .split-window-content iframe,
+        .edge-webview {
             width: 100%;
             height: 100%;
             border: none;
+            cursor: inherit;
         }
 
         /* 分身窗口 */
@@ -1181,7 +1187,308 @@
         body.rainbow-loading, body.rainbow-loading * {
             cursor: none !important;
         }
-    </style>
+    
+        .app-loading-mask {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(250, 250, 252, 0.92);
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            transition: opacity 0.4s ease;
+        }
+        .app-loading-mask.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .app-loading-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3.5px solid #e5e5ea;
+            border-top-color: #007aff;
+            border-radius: 50%;
+            animation: appSpin 0.9s linear infinite;
+        }
+        @keyframes appSpin {
+            to { transform: rotate(360deg); }
+        }
+        .app-loading-text {
+            color: #86868b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .app-loading-error {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #f5f5f7;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .app-loading-error.show {
+            display: flex;
+        }
+        .app-loading-error-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #ff3b30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 28px;
+        }
+        .app-loading-error-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .app-loading-error-desc {
+            font-size: 13px;
+            color: #86868b;
+            max-width: 300px;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .app-error-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .app-error-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .app-error-btn-primary {
+            background: #007aff;
+            color: #fff;
+        }
+        .app-error-btn-primary:hover {
+            background: #0051d5;
+            transform: translateY(-1px);
+        }
+        .app-error-btn-secondary {
+            background: rgba(0,0,0,0.05);
+            color: #007aff;
+        }
+        .app-error-btn-secondary:hover {
+            background: rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .app-window-content, .split-window-content, .edge-content {
+            position: relative;
+        }
+
+        /* 启动台 */
+        .launchpad-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(28, 28, 40, 0.75);
+            backdrop-filter: blur(80px) saturate(180%);
+            -webkit-backdrop-filter: blur(80px) saturate(180%);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+            cursor: default;
+        }
+        .launchpad-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse 60% 40% at 50% 0%, rgba(120, 120, 255, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 80%, rgba(255, 120, 180, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .launchpad-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .launchpad-container {
+            width: 90vw;
+            max-width: 1000px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            transform: scale(1.15);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .launchpad-overlay.show .launchpad-container {
+            transform: scale(1);
+        }
+        .launchpad-search {
+            width: 100%;
+            max-width: 300px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 10px;
+            margin-bottom: 40px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        .launchpad-search:focus-within {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255,255,255,0.35);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .launchpad-search svg {
+            width: 18px;
+            height: 18px;
+            color: rgba(255,255,255,0.6);
+            flex-shrink: 0;
+        }
+        .launchpad-search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            color: #fff;
+            outline: none;
+        }
+        .launchpad-search input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        .launchpad-grid {
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            padding: 10px;
+        }
+        .launchpad-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 18px;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            width: 100px;
+            background: transparent;
+        }
+        .launchpad-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.08);
+        }
+        .launchpad-item:active {
+            transform: scale(0.95);
+        }
+        .launchpad-item.hidden {
+            display: none;
+        }
+        .launchpad-icon {
+            width: 68px;
+            height: 68px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25), 0 0 0 0.5px rgba(255,255,255,0.15), inset 0 0.5px 0 rgba(255,255,255,0.25);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .launchpad-icon::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 40%, transparent 100%);
+            pointer-events: none;
+            border-radius: 16px;
+        }
+        .launchpad-item:hover .launchpad-icon {
+            transform: scale(1.05);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.35), 0 0 0 0.5px rgba(255,255,255,0.2), inset 0 0.5px 0 rgba(255,255,255,0.3);
+        }
+        .launchpad-icon svg {
+            width: 36px;
+            height: 36px;
+            color: #fff;
+        }
+        .launchpad-name {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            font-weight: 500;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .launchpad-item {
+            animation: launchpadAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        @keyframes launchpadAppear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .launchpad-pager {
+            display: flex;
+            gap: 8px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        .launchpad-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .launchpad-dot:hover {
+            background: rgba(255,255,255,0.6);
+        }
+        .launchpad-dot.active {
+            background: rgba(255,255,255,0.9);
+            width: 20px;
+            border-radius: 4px;
+        }
+        .launchpad-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 16px;
+            padding: 40px;
+        }
+</style>
 </head>
 <body>
     <div id="boot-screen">
@@ -1196,6 +1503,16 @@
             <div class="island-time" id="island-clock">12:00:00</div>
         </div>
         <div class="dock" id="dock">
+            <div class="dock-item" onclick="openLaunchpad()" title="启动台" data-app="launchpad">
+                <div class="dock-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </div>
+            </div>
             <div class="dock-item" onclick="openAppStore()" title="应用商城" data-app="appstore">
                 <div class="dock-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1303,7 +1620,7 @@
                     </div>
                 </div>
             </div>
-            <iframe class="edge-webview" id="webview" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation" referrerpolicy="no-referrer"></iframe>
+            <iframe class="edge-webview" id="webview" referrerpolicy="no-referrer" allow="fullscreen; autoplay; encrypted-media; gyroscope; accelerometer; gamepad; pointer-lock; microphone; camera" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -1404,9 +1721,7 @@
             <div class="app-window-title">Mobile Games</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-mobilegames" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-mobilegames"></div>
     </div>
     <div class="app-window" id="appWindow-ganne2">
         <div class="app-window-header">
@@ -1414,9 +1729,7 @@
             <div class="app-window-title">Ganne 2</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-ganne2" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-ganne2"></div>
     </div>
     <div class="app-window" id="appWindow-cloudspace">
         <div class="app-window-header">
@@ -1424,9 +1737,7 @@
             <div class="app-window-title">云空间</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-cloudspace" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-cloudspace"></div>
     </div>
     <div class="app-window" id="appWindow-lifereset">
         <div class="app-window-header">
@@ -1434,9 +1745,7 @@
             <div class="app-window-title">人生重开模拟器</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-lifereset" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-lifereset"></div>
     </div>
     <div class="app-window" id="appWindow-jump">
         <div class="app-window-header">
@@ -1444,9 +1753,7 @@
             <div class="app-window-title">跳一跳 3D</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-jump" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-jump"></div>
     </div>
     <div class="app-window" id="appWindow-ren2">
         <div class="app-window-header">
@@ -1454,9 +1761,7 @@
             <div class="app-window-title">人生重开模拟器 Pro</div>
             <div style="width: 12px;"></div>
         </div>
-        <div class="app-window-content">
-            <iframe id="appFrame-ren2" src="" loading="lazy"></iframe>
-        </div>
+        <div class="app-window-content" id="appContent-ren2"></div>
     </div>
 
     <div class="split-view-container" id="splitViewContainer">
@@ -1466,9 +1771,7 @@
                 <div class="split-window-title" id="splitTitle1">窗口 1</div>
                 <div style="width: 12px;"></div>
             </div>
-            <div class="split-window-content">
-                <iframe id="splitFrame1" src="" loading="lazy"></iframe>
-            </div>
+            <div class="split-window-content" id="splitContent1"></div>
         </div>
         <div class="split-divider">
             <div class="split-divider-line"></div>
@@ -1479,16 +1782,11 @@
                 <div class="split-window-title" id="splitTitle2">窗口 2</div>
                 <div style="width: 12px;"></div>
             </div>
-            <div class="split-window-content">
-                <iframe id="splitFrame2" src="" loading="lazy"></iframe>
-            </div>
+            <div class="split-window-content" id="splitContent2"></div>
         </div>
     </div>
 
-    <div class="boot-complete" id="bootComplete">
-        <h1>欢迎使用 PiPidw</h1>
-        <p>系统已准备就绪</p>
-    </div>
+    
 
 
     <!-- 彩虹加载光标 -->
@@ -1557,6 +1855,7 @@
         var svgIcons = {
             appstore: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
             browser: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+            settings: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
             mobilegames: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>',
             ganne2: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
             cloudspace: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
@@ -1595,13 +1894,7 @@
                             document.getElementById('boot-screen').classList.add('hidden');
                             setTimeout(function() {
                                 document.getElementById('desktop').classList.add('show');
-                                setTimeout(function() {
-                                    document.getElementById('bootComplete').classList.add('show');
-                                    setLoadingCursor(false);
-                                    setTimeout(function() {
-                                        document.getElementById('bootComplete').classList.remove('show');
-                                    }, 2500);
-                                }, 1500);
+                                setLoadingCursor(false);
                             }, 400);
                         }, 500);
                     }
@@ -1641,28 +1934,101 @@
             closeSplitView();
             currentOpenApp = appId;
             var appWindow = document.getElementById('appWindow-' + appId);
-            var appFrame = document.getElementById('appFrame-' + appId);
-            if (appWindow && appFrame) {
-                setLoadingCursor(true);
-                var loaded = false;
-                appFrame.onload = function() { loaded = true; setLoadingCursor(false); };
-                appFrame.onerror = function() { if(!loaded) setLoadingCursor(false); };
-                setTimeout(function() { if(!loaded) setLoadingCursor(false); }, 12000);
-                appFrame.src = config.url;
-                appWindow.classList.add('show');
-                document.querySelector('.overlay').classList.add('show');
-                var dockItem = document.querySelector('[data-app="' + appId + '"]');
-                if (dockItem) dockItem.classList.add('active');
-            }
+            var contentDiv = document.getElementById('appContent-' + appId);
+            if (!appWindow || !contentDiv) return;
+            contentDiv.innerHTML = '';
+
+            var mask = document.createElement('div');
+            mask.className = 'app-loading-mask';
+            mask.innerHTML = '<div class="app-loading-spinner"></div><div class="app-loading-text">正在加载 ' + config.name + '...</div>';
+            contentDiv.appendChild(mask);
+
+            var errorDiv = document.createElement('div');
+            errorDiv.className = 'app-loading-error';
+            errorDiv.id = 'appError-' + appId;
+
+            var icon = document.createElement('div');
+            icon.className = 'app-loading-error-icon';
+            icon.textContent = '!';
+            errorDiv.appendChild(icon);
+
+            var title = document.createElement('div');
+            title.className = 'app-loading-error-title';
+            title.textContent = '加载失败';
+            errorDiv.appendChild(title);
+
+            var desc = document.createElement('div');
+            desc.className = 'app-loading-error-desc';
+            desc.textContent = '无法连接到 ' + config.name + '，请检查网络后重试。';
+            errorDiv.appendChild(desc);
+
+            var actions = document.createElement('div');
+            actions.className = 'app-error-actions';
+
+            var btnRetry = document.createElement('button');
+            btnRetry.className = 'app-error-btn app-error-btn-primary';
+            btnRetry.textContent = '重新加载';
+            btnRetry.setAttribute('data-app-id', appId);
+            btnRetry.onclick = function() { retryApp(this.getAttribute('data-app-id')); };
+            actions.appendChild(btnRetry);
+
+            errorDiv.appendChild(actions);
+            contentDiv.appendChild(errorDiv);
+
+            var iframe = document.createElement('iframe');
+            iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;top:0;left:0;z-index:1;';
+            iframe.allow = 'fullscreen; autoplay; encrypted-media; gyroscope; accelerometer; gamepad; pointer-lock; microphone; camera';
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.referrerPolicy = 'no-referrer';
+
+            contentDiv.appendChild(iframe);
+            appWindow.classList.add('show');
+            document.querySelector('.overlay').classList.add('show');
+            var dockItem = document.querySelector('[data-app="' + appId + '"]');
+            if (dockItem) dockItem.classList.add('active');
+
+            setLoadingCursor(true);
+
+            setTimeout(function() {
+                setLoadingCursor(false);
+                mask.classList.add('fade-out');
+                setTimeout(function() { if(mask.parentNode) mask.parentNode.removeChild(mask); }, 400);
+                iframe.focus();
+                try { 
+                    iframe.contentWindow.focus();
+                    // 尝试注入光标样式
+                    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc && iframeDoc.head) {
+                        var style = iframeDoc.createElement('style');
+                        style.textContent = '* { cursor: inherit !important; } body { cursor: default !important; }';
+                        iframeDoc.head.appendChild(style);
+                    }
+                } catch(e) {}
+            }, 3000);
+
+            setTimeout(function() {
+                try {
+                    var doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (!doc || !doc.body || !doc.body.innerHTML || doc.body.innerHTML.length < 50) {
+                        document.getElementById('appError-' + appId).classList.add('show');
+                    }
+                } catch(e) {}
+            }, 10000);
+
+            iframe.src = config.url;
         }
+        function retryApp(appId) {
+            var errorDiv = document.getElementById('appError-' + appId);
+            if (errorDiv) errorDiv.classList.remove('show');
+            openApp(appId);
+        }
+        
 
         function closeAppWindow(appId) {
             var appWindow = document.getElementById('appWindow-' + appId);
-            var appFrame = document.getElementById('appFrame-' + appId);
-            if (appWindow) {
-                appWindow.classList.remove('show');
-                setTimeout(function() { appFrame.src = ''; }, 100);
-            }
+            var contentDiv = document.getElementById('appContent-' + appId);
+            if (appWindow) appWindow.classList.remove('show');
+            if (contentDiv) contentDiv.innerHTML = '';
             if (!document.getElementById('splitViewContainer').classList.contains('show')) {
                 document.querySelector('.overlay').classList.remove('show');
             }
@@ -1713,26 +2079,63 @@
         function closeBrowser() {
             document.getElementById('edgeBrowser').classList.remove('show');
             document.querySelector('.overlay').classList.remove('show');
-            document.querySelectorAll('.dock-item')[1].classList.remove('active');
-            document.getElementById('webview').src = '';
+            var webview = document.getElementById('webview');
+            var mask = document.getElementById('edgeLoadingMask');
+            if (mask) mask.remove();
+            if (webview) { webview.classList.remove('active'); webview.style.display = 'none'; webview.src = ''; }
+            document.getElementById('newTabPage').style.display = 'flex';
+            var items = document.querySelectorAll('.dock-item');
+            if (items[1]) items[1].classList.remove('active');
         }
         function goHome() {
+            var webview = document.getElementById('webview');
+            var mask = document.getElementById('edgeLoadingMask');
+            if (mask) mask.remove();
+            if (webview) { webview.classList.remove('active'); webview.style.display = 'none'; webview.src = ''; }
             document.getElementById('newTabPage').style.display = 'flex';
-            document.getElementById('webview').classList.remove('active');
             document.getElementById('addressInput').value = '';
-            document.getElementById('webview').src = '';
         }
         function openUrl(url) {
             document.getElementById('newTabPage').style.display = 'none';
+            var edgeContent = document.getElementById('edgeContent');
+            var oldWebview = document.getElementById('webview');
+            if (oldWebview) { oldWebview.src = ''; oldWebview.classList.remove('active'); oldWebview.style.display = 'none'; }
+            var mask = document.createElement('div');
+            mask.className = 'app-loading-mask';
+            mask.id = 'edgeLoadingMask';
+            mask.innerHTML = '<div class="app-loading-spinner"></div><div class="app-loading-text">正在加载页面...</div>';
+            edgeContent.appendChild(mask);
             var webview = document.getElementById('webview');
+            webview.style.display = 'block';
             webview.classList.add('active');
-            setLoadingCursor(true);
             var wloaded = false;
-            webview.onload = function() { wloaded = true; setLoadingCursor(false); };
-            webview.onerror = function() { if(!wloaded) setLoadingCursor(false); };
-            setTimeout(function() { if(!wloaded) setLoadingCursor(false); }, 15000);
-            webview.src = url;
+            webview.onload = function() {
+                if (wloaded) return;
+                wloaded = true;
+                setLoadingCursor(false);
+                var m = document.getElementById('edgeLoadingMask');
+                if (m) { m.classList.add('fade-out'); setTimeout(function() { if(m.parentNode) m.parentNode.removeChild(m); }, 400); }
+                webview.focus();
+                try { webview.contentWindow.focus(); } catch(e) {}
+            };
+            webview.onerror = function() {
+                if (wloaded) return;
+                wloaded = true;
+                setLoadingCursor(false);
+                var m = document.getElementById('edgeLoadingMask');
+                if (m) { m.classList.add('fade-out'); setTimeout(function() { if(m.parentNode) m.parentNode.removeChild(m); }, 400); }
+            };
+            setTimeout(function() {
+                if (!wloaded) {
+                    wloaded = true;
+                    setLoadingCursor(false);
+                    var m = document.getElementById('edgeLoadingMask');
+                    if (m) { m.classList.add('fade-out'); setTimeout(function() { if(m.parentNode) m.parentNode.removeChild(m); }, 400); }
+                }
+            }, 15000);
             document.getElementById('addressInput').value = url;
+            setLoadingCursor(true);
+            requestAnimationFrame(function() { webview.src = url; });
         }
         function handleAddressKey(event) {
             if (event.key === 'Enter') {
@@ -1757,7 +2160,11 @@
         }
         function refresh() {
             var webview = document.getElementById('webview');
-            if (webview.classList.contains('active')) webview.src = webview.src;
+            if (webview && webview.classList.contains('active')) {
+                var currentSrc = webview.src;
+                webview.src = '';
+                requestAnimationFrame(function() { webview.src = currentSrc; });
+            }
         }
         function goBack() {
             var webview = document.getElementById('webview');
@@ -1783,7 +2190,8 @@
         function closeAppStore() {
             document.getElementById('appstoreWindow').classList.remove('show');
             document.querySelector('.overlay').classList.remove('show');
-            document.querySelectorAll('.dock-item')[0].classList.remove('active');
+            var items = document.querySelectorAll('.dock-item');
+            if (items[0]) items[0].classList.remove('active');
         }
 
         var lsTimeout = null;
@@ -1813,18 +2221,38 @@
             closeBrowser();
             closeAppStore();
             closeAllAppWindows();
-            setLoadingCursor(true);
-            var splitLoaded = 0;
-            var splitFrame1 = document.getElementById('splitFrame1');
-            var splitFrame2 = document.getElementById('splitFrame2');
-            function checkSplitLoaded() { splitLoaded++; if(splitLoaded>=2) setLoadingCursor(false); }
-            splitFrame1.onload = checkSplitLoaded;
-            splitFrame2.onload = checkSplitLoaded;
-            setTimeout(function() { if(splitLoaded<2) setLoadingCursor(false); }, 15000);
+            var c1 = document.getElementById('splitContent1');
+            var c2 = document.getElementById('splitContent2');
+            if (!c1 || !c2) return;
+            c1.innerHTML = '';
+            c2.innerHTML = '';
             document.getElementById('splitTitle1').textContent = config.name + ' - 左';
             document.getElementById('splitTitle2').textContent = config.name + ' - 右';
-            splitFrame1.src = config.url;
-            splitFrame2.src = config.url;
+            setLoadingCursor(true);
+            var splitLoaded = 0;
+            function createSplitIframe(container, side) {
+                var mask = document.createElement('div');
+                mask.className = 'app-loading-mask';
+                mask.innerHTML = '<div class="app-loading-spinner"></div><div class="app-loading-text">正在加载 ' + config.name + ' (' + side + ')...</div>';
+                container.appendChild(mask);
+                var iframe = document.createElement('iframe');
+                iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;top:0;left:0;z-index:1;';
+                iframe.allow = 'fullscreen; autoplay; encrypted-media; gyroscope; accelerometer; gamepad; pointer-lock; microphone; camera';
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.referrerPolicy = 'no-referrer';
+                container.appendChild(iframe);
+                setTimeout(function() {
+                    mask.classList.add('fade-out');
+                    setTimeout(function() { if(mask.parentNode) mask.parentNode.removeChild(mask); }, 400);
+                    splitLoaded++;
+                    if (splitLoaded >= 2) setLoadingCursor(false);
+                    iframe.focus();
+                    try { iframe.contentWindow.focus(); } catch(e) {}
+                }, 3000);
+                iframe.src = config.url;
+            }
+            createSplitIframe(c1, '左');
+            createSplitIframe(c2, '右');
             document.getElementById('splitViewContainer').classList.add('show');
             document.querySelector('.overlay').classList.add('show');
             showNotification(config.name + ' 分身模式已启动');
@@ -1832,10 +2260,10 @@
         function closeSplitView() {
             document.getElementById('splitViewContainer').classList.remove('show');
             document.querySelector('.overlay').classList.remove('show');
-            setTimeout(function() {
-                document.getElementById('splitFrame1').src = '';
-                document.getElementById('splitFrame2').src = '';
-            }, 100);
+            var c1 = document.getElementById('splitContent1');
+            var c2 = document.getElementById('splitContent2');
+            if(c1) c1.innerHTML = '';
+            if(c2) c2.innerHTML = '';
         }
 
         function showNotification(message) {
@@ -1863,16 +2291,21 @@
         }
 
         function openSettings() {
+            var sw = document.getElementById('settingsWindow');
+            if (!sw) { showNotification('设置功能暂未开放'); return; }
             setLoadingCursor(true);
             setTimeout(function(){ setLoadingCursor(false); }, 500);
-            document.getElementById('settingsWindow').classList.add('show');
+            sw.classList.add('show');
             document.querySelector('.overlay').classList.add('show');
-            document.querySelectorAll('.dock-item')[2].classList.add('active');
+            var items = document.querySelectorAll('.dock-item');
+            if (items[2]) items[2].classList.add('active');
         }
         function closeSettings() {
-            document.getElementById('settingsWindow').classList.remove('show');
+            var sw = document.getElementById('settingsWindow');
+            if (sw) sw.classList.remove('show');
             document.querySelector('.overlay').classList.remove('show');
-            document.querySelectorAll('.dock-item')[2].classList.remove('active');
+            var items = document.querySelectorAll('.dock-item');
+            if (items[2]) items[2].classList.remove('active');
         }
 
         // ========== 彩虹加载光标 ==========
@@ -1989,6 +2422,268 @@
                 case 'new-zip': showNotification('新建 ZIP 文件'); break;
             }
         }
-    </script>
+    
+        // ========== 启动台 ==========
+        var launchpadCurrentPage = 0;
+        var launchpadTotalPages = 1;
+        var launchpadAppsPerPage = 24; // 4x6 grid
+
+        function openLaunchpad() {
+            var overlay = document.getElementById('launchpadOverlay');
+            var grid = document.getElementById('launchpadGrid');
+            if (!overlay || !grid) return;
+
+            grid.innerHTML = '';
+            launchpadCurrentPage = 0;
+
+            // 内置应用
+            var builtInApps = [
+                {id:'browser', name:'Edge 浏览器', icon:svgIcons.browser, color:'linear-gradient(135deg, #0078d4, #106ebe)', action:function(){ closeLaunchpad(); openBrowser(); }},
+                {id:'appstore', name:'App Store', icon:svgIcons.appstore, color:'linear-gradient(135deg, #0a84ff, #0066cc)', action:function(){ closeLaunchpad(); openAppStore(); }},
+                {id:'settings', name:'设置', icon:svgIcons.settings, color:'linear-gradient(135deg, #8e8e93, #636366)', action:function(){ closeLaunchpad(); openSettings(); }}
+            ];
+
+            // 已安装应用
+            var allApps = builtInApps.slice();
+            installedApps.forEach(function(appId) {
+                if (appConfigs[appId]) {
+                    var cfg = appConfigs[appId];
+                    allApps.push({
+                        id: appId,
+                        name: cfg.name,
+                        icon: cfg.icon,
+                        color: cfg.color,
+                        action: function() { closeLaunchpad(); openApp(appId); }
+                    });
+                }
+            });
+
+            // 计算页数
+            launchpadTotalPages = Math.ceil(allApps.length / launchpadAppsPerPage);
+            if (launchpadTotalPages < 1) launchpadTotalPages = 1;
+
+            // 创建分页容器
+            var pagesContainer = document.createElement('div');
+            pagesContainer.className = 'launchpad-pages';
+            pagesContainer.style.cssText = 'display:flex;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);width:' + (launchpadTotalPages * 100) + '%;';
+
+            for (var p = 0; p < launchpadTotalPages; p++) {
+                var page = document.createElement('div');
+                page.className = 'launchpad-page';
+                page.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:24px 32px;width:100%;padding:10px;flex-shrink:0;justify-items:center;';
+
+                var startIdx = p * launchpadAppsPerPage;
+                var endIdx = Math.min(startIdx + launchpadAppsPerPage, allApps.length);
+
+                for (var i = startIdx; i < endIdx; i++) {
+                    var app = allApps[i];
+                    var item = document.createElement('div');
+                    item.className = 'launchpad-item';
+                    item.setAttribute('data-name', app.name.toLowerCase());
+                    item.setAttribute('data-page', p);
+                    item.style.animationDelay = ((i - startIdx) * 0.02) + 's';
+
+                    var iconDiv = document.createElement('div');
+                    iconDiv.className = 'launchpad-icon';
+                    iconDiv.style.background = app.color;
+                    iconDiv.innerHTML = app.icon;
+
+                    var nameDiv = document.createElement('div');
+                    nameDiv.className = 'launchpad-name';
+                    nameDiv.textContent = app.name;
+
+                    item.appendChild(iconDiv);
+                    item.appendChild(nameDiv);
+                    item.onclick = app.action;
+
+                    page.appendChild(item);
+                }
+
+                pagesContainer.appendChild(page);
+            }
+
+            grid.appendChild(pagesContainer);
+
+            // 更新分页指示器
+            updateLaunchpadPager();
+
+            overlay.classList.add('show');
+            document.getElementById('launchpadSearch').value = '';
+            document.getElementById('launchpadSearch').focus();
+
+            // 添加滑动支持
+            initLaunchpadSwipe(pagesContainer);
+        }
+
+        function updateLaunchpadPager() {
+            var pager = document.getElementById('launchpadPager');
+            if (!pager) return;
+            pager.innerHTML = '';
+            for (var i = 0; i < launchpadTotalPages; i++) {
+                var dot = document.createElement('div');
+                dot.className = 'launchpad-dot' + (i === launchpadCurrentPage ? ' active' : '');
+                dot.onclick = function(idx) { return function() { goToLaunchpadPage(idx); }; }(i);
+                pager.appendChild(dot);
+            }
+        }
+
+        function goToLaunchpadPage(page) {
+            if (page < 0 || page >= launchpadTotalPages) return;
+            launchpadCurrentPage = page;
+            var container = document.querySelector('.launchpad-pages');
+            if (container) {
+                container.style.transform = 'translateX(-' + (page * 100 / launchpadTotalPages) + '%)';
+            }
+            updateLaunchpadPager();
+        }
+
+        function initLaunchpadSwipe(container) {
+            var startX = 0;
+            var startY = 0;
+            var isDragging = false;
+
+            container.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isDragging = true;
+            }, {passive: true});
+
+            container.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                var diffX = startX - e.touches[0].clientX;
+                var diffY = startY - e.touches[0].clientY;
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    e.preventDefault();
+                }
+            }, {passive: false});
+
+            container.addEventListener('touchend', function(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                var diffX = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0 && launchpadCurrentPage < launchpadTotalPages - 1) {
+                        goToLaunchpadPage(launchpadCurrentPage + 1);
+                    } else if (diffX < 0 && launchpadCurrentPage > 0) {
+                        goToLaunchpadPage(launchpadCurrentPage - 1);
+                    }
+                }
+            }, {passive: true});
+
+            // 鼠标拖拽
+            container.addEventListener('mousedown', function(e) {
+                startX = e.clientX;
+                isDragging = true;
+                container.style.cursor = 'grabbing';
+            });
+
+            container.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+            });
+
+            container.addEventListener('mouseup', function(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                container.style.cursor = 'grab';
+                var diffX = startX - e.clientX;
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0 && launchpadCurrentPage < launchpadTotalPages - 1) {
+                        goToLaunchpadPage(launchpadCurrentPage + 1);
+                    } else if (diffX < 0 && launchpadCurrentPage > 0) {
+                        goToLaunchpadPage(launchpadCurrentPage - 1);
+                    }
+                }
+            });
+
+            container.addEventListener('mouseleave', function() {
+                isDragging = false;
+                container.style.cursor = 'grab';
+            });
+        }
+
+        function closeLaunchpad() {
+            var overlay = document.getElementById('launchpadOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function filterLaunchpad() {
+            var query = document.getElementById('launchpadSearch').value.toLowerCase().trim();
+            var items = document.querySelectorAll('.launchpad-item');
+            var hasVisible = false;
+            items.forEach(function(item) {
+                var name = item.getAttribute('data-name');
+                if (!query || name.indexOf(query) !== -1) {
+                    item.classList.remove('hidden');
+                    item.style.display = 'flex';
+                    hasVisible = true;
+                } else {
+                    item.classList.add('hidden');
+                    item.style.display = 'none';
+                }
+            });
+
+            // 搜索时隐藏分页
+            var pager = document.getElementById('launchpadPager');
+            var pages = document.querySelector('.launchpad-pages');
+            if (query) {
+                if (pager) pager.style.display = 'none';
+                if (pages) pages.style.transform = 'translateX(0)';
+            } else {
+                if (pager) pager.style.display = 'flex';
+                if (pages) goToLaunchpadPage(launchpadCurrentPage);
+            }
+
+            var grid = document.getElementById('launchpadGrid');
+            var emptyMsg = grid.querySelector('.launchpad-empty');
+            if (emptyMsg) emptyMsg.remove();
+            if (!hasVisible) {
+                var empty = document.createElement('div');
+                empty.className = 'launchpad-empty';
+                empty.textContent = '未找到应用';
+                grid.appendChild(empty);
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F4' || (e.metaKey && e.code === 'Space')) {
+                e.preventDefault();
+                var overlay = document.getElementById('launchpadOverlay');
+                if (overlay && overlay.classList.contains('show')) {
+                    closeLaunchpad();
+                } else {
+                    openLaunchpad();
+                }
+            }
+            if (e.key === 'Escape') {
+                closeLaunchpad();
+            }
+            // 左右箭头切换页面
+            if (e.key === 'ArrowRight') {
+                var overlay = document.getElementById('launchpadOverlay');
+                if (overlay && overlay.classList.contains('show')) {
+                    goToLaunchpadPage(launchpadCurrentPage + 1);
+                }
+            }
+            if (e.key === 'ArrowLeft') {
+                var overlay = document.getElementById('launchpadOverlay');
+                if (overlay && overlay.classList.contains('show')) {
+                    goToLaunchpadPage(launchpadCurrentPage - 1);
+                }
+            }
+        });
+</script>
+
+    <!-- 启动台 -->
+    <div class="launchpad-overlay" id="launchpadOverlay" onclick="closeLaunchpad()">
+        <div class="launchpad-container" id="launchpadContainer" onclick="event.stopPropagation()">
+            <div class="launchpad-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="launchpadSearch" placeholder="搜索" oninput="filterLaunchpad()">
+            </div>
+            <div class="launchpad-grid" id="launchpadGrid"></div>
+            <div class="launchpad-pager" id="launchpadPager"></div>
+        </div>
+    </div>
 </body>
 </html>
